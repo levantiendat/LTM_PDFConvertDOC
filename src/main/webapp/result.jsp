@@ -2,6 +2,42 @@
 <html>
 <head>
     <title>Result Page</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #e6f7ff; /* Màu xanh dương nhạt */
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 50px;
+        }
+
+        p {
+            color: #555;
+            margin: 20px 0;
+        }
+
+        form {
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <h2>Conversion Result</h2>
