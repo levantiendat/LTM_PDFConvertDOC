@@ -1,11 +1,24 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Result Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to DOC Converter</title>
+    <script>
+        function logout() {
+            // Chuyển hướng đến trang AccountServlet với tham số logout=1
+            window.location.href = 'AccountServlet?logout=1';
+        }
+        function checkLogin() {
+            if (!<%= session.getAttribute("username") != null %>) {
+                window.location.href = 'Login.jsp';
+            }
+        }
+    </script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #e6f7ff; /* Màu xanh dương nhạt */
+            background-color: #f4f4f4;
             text-align: center;
             margin: 0;
             padding: 0;
@@ -15,17 +28,28 @@
             color: #333;
             margin-top: 50px;
         }
-
-        p {
-            color: #555;
-            margin: 20px 0;
-        }
-
+		h3{
+			color: #FFFFFF;
+		}
         form {
-            margin: 20px 0;
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        button {
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
             background-color: #4caf50;
             color: #fff;
             padding: 10px 20px;
@@ -34,12 +58,45 @@
             cursor: pointer;
         }
 
-        button:hover {
+        input[type="submit"]:hover {
             background-color: #45a049;
+        }
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        div button {
+            background-color: transparent;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
-<body>
+<body onload="checkLogin()">
+	<%
+		
+		String username="";
+    	// Kiểm tra xem người dùng đã đăng nhập chưa
+    	if (session != null && session.getAttribute("username") != null) {
+        	// Lấy thông tin người dùng từ session
+         username = (String) session.getAttribute("username");}
+		
+	%>
+    <div>
+        <button>Lịch sử chuyển đổi</button>
+        <button>Chuyển đổi file</button>
+        <h3>Xin chào, <%=username %></h3>
+        <button onclick="logout()">Đăng xuất</button>
+    </div>
     <h2>Conversion Result</h2>
 
     <% 

@@ -6,6 +6,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF to DOC Converter</title>
+    <script>
+        function logout() {
+            // Chuyển hướng đến trang AccountServlet với tham số logout=1
+            window.location.href = 'AccountServlet?logout=1';
+        }
+        function checkLogin() {
+            if (!<%= session.getAttribute("username") != null %>) {
+                window.location.href = 'Login.jsp';
+            }
+        }
+    </script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -19,7 +30,9 @@
             color: #333;
             margin-top: 50px;
         }
-
+		h3{
+			color: #FFFFFF;
+		}
         form {
             max-width: 400px;
             margin: 20px auto;
@@ -70,7 +83,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="checkLogin()">
 	<%
 		
 		String username="";
@@ -83,11 +96,11 @@
     <div>
         <button>Lịch sử chuyển đổi</button>
         <button>Chuyển đổi file</button>
-        <h1>Xin chào, <%=username %></h1>
-        <button>Đăng xuất</button>
+        <h3>Xin chào, <%=username %></h3>
+        <button onclick="logout()">Đăng xuất</button>
     </div>
     <h2>Choose a PDF file to convert to DOC</h2>
-    <form method="post" action="ConvertFileServlet" enctype="multipart/form-data">
+    <form method="post" action="FileServlet" enctype="multipart/form-data">
         <input type="file" name="pdfFile" accept=".pdf" required>
         <br>
         <input type="submit" name="ok" value="Convert">

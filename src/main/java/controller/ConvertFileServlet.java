@@ -39,6 +39,7 @@ public class ConvertFileServlet extends HttpServlet {
 
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
             File uploadDir = new File(uploadPath);
+            
             if (!uploadDir.exists()) {
                 uploadDir.mkdir();
             }

@@ -35,6 +35,7 @@ public class AccountServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		String isLogin = request.getParameter("signin");
 		String isRegister = request.getParameter("signup");
+		String isLogout = request.getParameter("logout");
 		if("1".equals(isLogin)) {
 			String username = (String) request.getParameter("username");
 			String password = (String) request.getParameter("password");
@@ -82,7 +83,13 @@ public class AccountServlet extends HttpServlet {
 				RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
 				rd.forward(request, response);
 			}
-		} else {
+		} else if("1".equals(isLogout)) {
+			HttpSession session = request.getSession(false);
+	        if (session != null) {
+	            session.invalidate();
+	        }
+	        response.sendRedirect("Login.jsp");
+		}else {
 			String destination = "/Login.jsp";
 			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
 			rd.forward(request, response);
