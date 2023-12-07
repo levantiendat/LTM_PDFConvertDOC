@@ -1,7 +1,11 @@
 package model.bo;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import com.spire.pdf.FileFormat;
+import com.spire.pdf.PdfDocument;
 
 import model.bean.ConvertHistory;
 import model.dao.ConvertDAO;
@@ -33,8 +37,50 @@ public class ConvertBO {
 	}
 	public void ProcessConvert(String fullSavePath, String fullGivePath) {
 		ArrayList<ConvertHistory> list = getAllOKList();
-		for(ConvertHistory history: list) {
-			System.out.println(history.getID() + " "+ history.getUsername()+ " "+ history.getPDFFile()+" " +history.getDOCFile()+ history.getState()+" "+ history.getDate().toString());
+		for(ConvertHistory request: list) {
+			ConvertDAO dao = new ConvertDAO();
+			String fileName = request.getPDFFile();
+			String giveFilePath = fullGivePath + File.separator + fileName;
+			
+			String saveFileName = fileName.replace(".pdf", ".docx");
+			String saveFilePath = fullSavePath + File.separator + saveFileName;
+			//ConvertDAO -> Update inProcess
+			request.setDOCFile(saveFileName);
+			request.setState(PROCESSING);
+			dao.UpdatResult(request);
+			try {
+				Boolean result = convertPdfToDocx(giveFilePath, saveFilePath);
+				if(result) {
+					//ConvertDAO -> Update oke
+					request.setState(CONVERT_SUCCESSFULLY);
+					dao.UpdatResult(request);
+				} else {
+					//ConvertDAO -> Update failed
+					request.setState(CONVERT_FAILED);
+					dao.UpdatResult(request);
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+				//ConvertDAO -> Update failed
+				request.setState(CONVERT_FAILED);
+				dao.UpdatResult(request);
+			}
+			
 		}
 	}
+	private Boolean convertPdfToDocx(String pdfFilePath, String docxFilePath) throws IOException {
+        try {
+            // Load the PDF document
+            PdfDocument doc = new PdfDocument();
+            doc.loadFromFile(pdfFilePath);
+            
+            doc.saveToFile(docxFilePath, FileFormat.DOCX);
+            
+            doc.close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

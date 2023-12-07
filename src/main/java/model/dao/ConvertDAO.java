@@ -50,4 +50,23 @@ public class ConvertDAO {
 			return null;
 		}
 	}
+	public void UpdatResult(ConvertHistory history) {
+		try {
+			Connection con = getConnection();
+			if(con!=null) {
+				ArrayList<ConvertHistory> list = new ArrayList<ConvertHistory>();
+				
+				String query = String.format("UPDATE converthistory SET Username = '%s', PDFFile = '%s', DocFile = '%s', State = '%d', RequestTime = '%s' WHERE ID = %d", history.getUsername(), history.getPDFFile(), history.getDOCFile(), history.getState(), history.getDate().toString(), history.getID());
+				
+				Statement stmt =con.createStatement();
+				stmt.executeUpdate(query);
+				
+				stmt.close();
+				
+			} 
+		} catch(Exception e) {
+			e.printStackTrace();
+			
+		}
+	}
 }

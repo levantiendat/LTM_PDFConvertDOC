@@ -36,14 +36,18 @@ public class AccountServlet extends HttpServlet {
 		String isLogin = request.getParameter("signin");
 		String isRegister = request.getParameter("signup");
 		String isLogout = request.getParameter("logout");
-		if("1".equals(isLogin)) {
+		HttpSession session = request.getSession();
+		if(session.getAttribute("username") != null) {
+			String destination = "/inputFile.jsp";
+			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
+			rd.forward(request, response);
+		} else if("1".equals(isLogin)) {
 			String username = (String) request.getParameter("username");
 			String password = (String) request.getParameter("password");
 			Account account = new Account();
 			AccountBO bo = new AccountBO();
 			account = bo.getAccount(username, password);
 			if(account!=null) {
-				HttpSession session = request.getSession();
 				session.setAttribute("username", account.getUsername());
 				String destination = "/inputFile.jsp";
 				RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
@@ -84,7 +88,7 @@ public class AccountServlet extends HttpServlet {
 				rd.forward(request, response);
 			}
 		} else if("1".equals(isLogout)) {
-			HttpSession session = request.getSession(false);
+			session = request.getSession(false);
 	        if (session != null) {
 	            session.invalidate();
 	        }
