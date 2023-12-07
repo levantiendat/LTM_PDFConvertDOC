@@ -8,6 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import model.bo.UploadBO;
@@ -30,7 +31,8 @@ public class FileServlet extends HttpServlet {
         try {
         	UploadBO bo = new UploadBO();
             String appPath = request.getServletContext().getRealPath("");
-            
+            HttpSession session = request.getSession();
+    		String username = (String) session.getAttribute("username");
 
             String fullSavePath = bo.getFullSavePath(appPath);
 
@@ -42,7 +44,7 @@ public class FileServlet extends HttpServlet {
 
             
             Part pdfPart = request.getPart("pdfFile");
-            bo.saveUploadFile(pdfPart, fullSavePath);
+            bo.saveUploadFile(pdfPart, fullSavePath, username);
 
 
             // Upload thành công.

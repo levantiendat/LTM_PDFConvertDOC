@@ -4,6 +4,8 @@ import java.io.File;
 
 import javax.servlet.http.Part;
 
+import model.dao.UploadDAO;
+
 public class UploadBO {
 	private final static int UPLOAD_OK = 1;
 	private final static int UPLOAD_FAILED = 0;
@@ -29,20 +31,24 @@ public class UploadBO {
         
         return fullSavePath;
 	}
-	public void saveUploadFile(Part part, String fullSavePath) {
-		try {
-			String fileName = extractFileName(part);
+	public void saveUploadFile(Part part, String fullSavePath, String username) {
+		String filePath="";
+		UploadDAO dao = new UploadDAO();
+		String fileName = extractFileName(part);
 
-	        if (fileName != null && fileName.length() > 0) {
-	            String filePath = fullSavePath + File.separator + fileName;
-	            System.out.println("Write attachment to file: " + filePath);
-
-	            // Ghi vào file.
+	    if (fileName != null && fileName.length() > 0) {
+	        filePath = fullSavePath + File.separator + fileName;
+	        System.out.println("Write attachment to file: " + filePath);
+	        try {
 	            part.write(filePath);
+	            dao.addNewRequest(username, fileName, UPLOAD_OK);
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	            dao.addNewRequest(username, fileName, UPLOAD_FAILED);
 	        }
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+	             
+	   }
+		
 		
 	}
 }

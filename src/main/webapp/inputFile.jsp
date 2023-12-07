@@ -11,6 +11,10 @@
             // Chuyển hướng đến trang AccountServlet với tham số logout=1
             window.location.href = 'AccountServlet?logout=1';
         }
+        function history() {
+            // Chuyển hướng đến trang AccountServlet với tham số logout=1
+            window.location.href = 'ConvertServlet';
+        }
         function checkLogin() {
             if (!<%= session.getAttribute("username") != null %>) {
                 window.location.href = 'Login.jsp';
@@ -94,7 +98,7 @@
 		
 	%>
     <div>
-        <button>Lịch sử chuyển đổi</button>
+        <button onClick="history()">Lịch sử chuyển đổi </button>
         <button>Chuyển đổi file</button>
         <h3>Xin chào, <%=username %></h3>
         <button onclick="logout()">Đăng xuất</button>
