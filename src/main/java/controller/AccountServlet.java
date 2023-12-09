@@ -37,7 +37,15 @@ public class AccountServlet extends HttpServlet {
 		String isRegister = request.getParameter("signup");
 		String isLogout = request.getParameter("logout");
 		HttpSession session = request.getSession();
-		if(session.getAttribute("username") != null) {
+		if("1".equals(isLogout)) {
+			session = request.getSession(false);
+	        if (session != null) {
+	            session.invalidate();
+	        }
+	        String destination = "/Login.jsp";
+			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
+			rd.forward(request, response);
+		} else if(session.getAttribute("username") != null) {
 			String destination = "/inputFile.jsp";
 			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
 			rd.forward(request, response);
@@ -87,12 +95,7 @@ public class AccountServlet extends HttpServlet {
 				RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
 				rd.forward(request, response);
 			}
-		} else if("1".equals(isLogout)) {
-			session = request.getSession(false);
-	        if (session != null) {
-	            session.invalidate();
-	        }
-	        response.sendRedirect("Login.jsp");
+		
 		}else {
 			String destination = "/Login.jsp";
 			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);

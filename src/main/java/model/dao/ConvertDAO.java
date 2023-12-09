@@ -31,9 +31,10 @@ public class ConvertDAO {
 				ResultSet res=stmt.executeQuery(query);
 				while(res.next()) {
 					ConvertHistory history = new ConvertHistory();
-					history.setID(res.getInt("ID"));
+					history.setServerPDFFile(res.getString("ServerPDFFile"));
 					history.setUsername(res.getString("Username"));
 					history.setPDFFile(res.getString("PDFFile"));
+					history.setServerDOCFile(res.getString("ServerDOCFile"));
 					history.setDOCFile(res.getString("DOCFile"));
 					history.setState(res.getInt("State"));
 					history.setDate(res.getTimestamp("RequestTime"));
@@ -50,13 +51,43 @@ public class ConvertDAO {
 			return null;
 		}
 	}
-	public void UpdatResult(ConvertHistory history) {
+	public ConvertHistory getHistory(String ServerPDFFile) {
+		try {
+			Connection con = getConnection();
+			if(con!=null) {
+				ConvertHistory history = new ConvertHistory();
+				String query = String.format("Select * from converthistory where ServerPDFFile = '%s'", ServerPDFFile);
+				Statement stmt =con.createStatement();
+				ResultSet res=stmt.executeQuery(query);
+				if(res.next()) {
+					
+					history.setServerPDFFile(res.getString("ServerPDFFile"));
+					history.setUsername(res.getString("Username"));
+					history.setPDFFile(res.getString("PDFFile"));
+					history.setServerDOCFile(res.getString("ServerDOCFile"));
+					history.setDOCFile(res.getString("DOCFile"));
+					history.setState(res.getInt("State"));
+					history.setDate(res.getTimestamp("RequestTime"));
+					
+				}
+				res.close();
+				stmt.close();
+				return history;
+			} else {
+				return null;
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public void UpdateResult(ConvertHistory history) {
 		try {
 			Connection con = getConnection();
 			if(con!=null) {
 				ArrayList<ConvertHistory> list = new ArrayList<ConvertHistory>();
 				
-				String query = String.format("UPDATE converthistory SET Username = '%s', PDFFile = '%s', DocFile = '%s', State = '%d', RequestTime = '%s' WHERE ID = %d", history.getUsername(), history.getPDFFile(), history.getDOCFile(), history.getState(), history.getDate().toString(), history.getID());
+				String query = String.format("UPDATE converthistory SET Username = '%s', PDFFile = '%s',ServerDOCFile= '%s', DocFile = '%s', State = '%d', RequestTime = '%s' WHERE ServerPDFFile = '%s'", history.getUsername(), history.getPDFFile(),history.getServerDOCFile(), history.getDOCFile(), history.getState(), history.getDate().toString(), history.getServerPDFFile());
 				
 				Statement stmt =con.createStatement();
 				stmt.executeUpdate(query);

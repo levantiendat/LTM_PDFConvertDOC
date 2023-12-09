@@ -20,22 +20,34 @@ public class UploadDAO {
 			return null;
 		}
 	}
-	public void addNewRequest(String username, String pdfFilePath, int state) {
+	public void addNewRequest(String ServerPDFFile,String username, String pdfFilePath, int state) {
 		try {
 			Connection con = getConnection();
 			if(con!=null) {
-				String query = String.format("Select * from converthistory");
 				Statement stmt =con.createStatement();
-				ResultSet res=stmt.executeQuery(query);
-				int maxId = 0;
-				while(res.next()) {
-					maxId = res.getInt("ID");
-				}
-				res.close();
+				
 				Timestamp now = new Timestamp(System.currentTimeMillis());
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		        String formattedTimestamp = dateFormat.format(now);
-		        query = String.format("INSERT INTO `converthistory` (`ID`, `Username`, `PDFFile`, `DocFile`, `State`, `RequestTime`) VALUES ('%d', '%s', '%s', '', '%d', '%s')", maxId+1,username, pdfFilePath, state, formattedTimestamp );
+		        String query = String.format("INSERT INTO `converthistory` (`ServerPDFFile`, `Username`, `PDFFile`, `ServerDOCFile`, `DocFile`, `State`, `RequestTime`) VALUES ('%s', '%s', '%s', '', '', '%d', '%s')", ServerPDFFile,username, pdfFilePath, state, formattedTimestamp );
+		        stmt.executeUpdate(query);
+		        stmt.close();
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();;
+		}
+	}
+	public void changeState(String ServerPDFFile, int State) {
+		try {
+			Connection con = getConnection();
+			if(con!=null) {
+				Statement stmt =con.createStatement();
+				
+				Timestamp now = new Timestamp(System.currentTimeMillis());
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		        String formattedTimestamp = dateFormat.format(now);
+		        String query = String.format("UPDATE `converthistory` SET State = '%d' WHERE ServerPDFFile = '%s'",State, ServerPDFFile );
 		        stmt.executeUpdate(query);
 		        stmt.close();
 			}

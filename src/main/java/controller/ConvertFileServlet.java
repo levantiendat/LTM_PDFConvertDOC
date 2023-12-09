@@ -1,5 +1,10 @@
 package controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -7,74 +12,71 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import com.spire.pdf.FileFormat;
-import com.spire.pdf.PdfDocument;
+import model.bo.ConvertBO;
+import model.bo.UploadFileBO;
 
-
-import java.io.File;
-
-import java.io.IOException;
-import java.nio.file.Paths;
 
 @WebServlet("/ConvertFileServlet")
-@MultipartConfig
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+			maxFileSize = 1024 * 1024 * 10, // 10MB
+			maxRequestSize = 1024 * 1024 * 50) // 50MB
 public class ConvertFileServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 1L;
+    
+    private BlockingQueue<String> convertFileQuene;
+    public static final String PDF_DIRECTORY = "ConvertFile/PDFFile";
+    public Boolean isTakeAppPath = false;
     public ConvertFileServlet() {
         super();
+        
+        convertFileQuene = new ArrayBlockingQueue<>(1000);
+        
+        Thread convertThread = new Thread(new ConvertBO(convertFileQuene));
+        
+        
+        convertThread.start();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doPost(request, response);
-    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		try {
+			Part pdfPart = request.getPart("pdfFile");
+			String appPath = request.getServletContext().getRealPath("");
+			if(!isTakeAppPath) {
+				convertFileQuene.put(appPath);
+				isTakeAppPath = true;
+			}
+			UploadFileBO bo = new UploadFileBO();
+			HttpSession session = request.getSession();
+			String username = (String) session.getAttribute("username");
+			String fullPDFPath = bo.getFullPDFPath(appPath);
+			
+			File filePDFDir = new File(fullPDFPath);
+			if (!filePDFDir.exists()) {
+            filePDFDir.mkdirs(); 
+			}
+			String ServerFileName = bo.saveUploadFile(pdfPart, fullPDFPath, username);
+			if(ServerFileName.length()>0) {
+				convertFileQuene.put(ServerFileName);
+			}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            Part filePart = request.getPart("pdfFile"); // "pdfFile" là name của input type=file trong form
+    		String destination = "/inputFile.jsp";
+			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
+			rd.forward(request, response);
+    		//Chạy 2 luồng
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 
-            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-            File uploadDir = new File(uploadPath);
-            
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
-            }
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
 
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            String pdfFilePath = uploadPath + File.separator + fileName;
-            String docxFilePath = pdfFilePath.replace(".pdf", ".docx");
-            filePart.write(pdfFilePath);
-
-            convertPdfToDocx(pdfFilePath, docxFilePath);
-
-            request.setAttribute("docxFilePath", docxFilePath);
-
-            RequestDispatcher dispatcher = request.getRequestDispatcher("result.jsp");
-            dispatcher.forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            String destination = "/inputFile.jsp";
-            RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
-            rd.forward(request, response);
-        }
-    }
-
-    private void convertPdfToDocx(String pdfFilePath, String docxFilePath) throws IOException {
-        try {
-            // Load the PDF document
-            PdfDocument doc = new PdfDocument();
-            doc.loadFromFile(pdfFilePath);
-            
-            doc.saveToFile(docxFilePath, FileFormat.DOCX);
-            
-            doc.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Error converting PDF to DOCX.");
-        }
-    }
 }

@@ -12,7 +12,7 @@
             window.location.href = 'AccountServlet?logout=1';
         }
         function history() {
-            window.location.href = 'ConvertServlet';
+            window.location.href = 'ResultServlet?show=1';
         }
         function convert(){
         	window.location.href = 'AccountServlet';
@@ -106,7 +106,7 @@
         <button onclick="logout()">Đăng xuất</button>
     </div>
     <h2>Choose a PDF file to convert to DOC</h2>
-    <form method="post" action="FileServlet" enctype="multipart/form-data">
+    <form method="post" action="ConvertFileServlet" enctype="multipart/form-data">
         <input type="file" name="pdfFile" accept=".pdf" required>
         <br>
         <input type="submit" name="ok" value="Convert">
