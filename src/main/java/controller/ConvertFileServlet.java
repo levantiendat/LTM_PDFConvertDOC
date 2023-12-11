@@ -35,8 +35,6 @@ public class ConvertFileServlet extends HttpServlet {
         convertFileQuene = new ArrayBlockingQueue<>(1000);
         
         Thread convertThread = new Thread(new ConvertBO(convertFileQuene));
-        
-        
         convertThread.start();
     }
 
@@ -53,7 +51,6 @@ public class ConvertFileServlet extends HttpServlet {
 			HttpSession session = request.getSession();
 			String username = (String) session.getAttribute("username");
 			String fullPDFPath = bo.getFullPDFPath(appPath);
-			
 			File filePDFDir = new File(fullPDFPath);
 			if (!filePDFDir.exists()) {
             filePDFDir.mkdirs(); 
@@ -62,11 +59,10 @@ public class ConvertFileServlet extends HttpServlet {
 			if(ServerFileName.length()>0) {
 				convertFileQuene.put(ServerFileName);
 			}
-
     		String destination = "/inputFile.jsp";
 			RequestDispatcher rd = getServletContext().getRequestDispatcher(destination);
 			rd.forward(request, response);
-    		//Chạy 2 luồng
+    		
 			
 		} catch(Exception e) {
 			e.printStackTrace();
